@@ -12,3 +12,4 @@ Generating different synthetic datasets is done by modifying the for loop in the
 * numpy 1.19.4
 * tensorflow 2.4.1
 * scikeras 0.3.1
+* matplotlib 3.3.3
