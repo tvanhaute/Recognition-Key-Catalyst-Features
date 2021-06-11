@@ -11,7 +11,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.inspection import permutation_importance
 
 # read data
-data = pd.read_csv("../OCM-NguyenEtAl.csv")
+data = pd.read_csv("OCM-NguyenEtAl.csv")
 
 # convert M1, M2 and M3 into numeric values, not necessary but artefact of me working with different algorithms
 le = preprocessing.LabelEncoder()
