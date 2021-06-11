@@ -13,14 +13,14 @@ from sklearn.inspection import permutation_importance
 # read data
 data = pd.read_csv("../OCM-NguyenEtAl.csv")
 
-# convert M1, M2 and M3 into numeric values
+# convert M1, M2 and M3 into numeric values, not necessary but artefact of me working with different algorithms
 le = preprocessing.LabelEncoder()
 data["M1"] = le.fit_transform(data["M1"])
 data["M2"] = le.fit_transform(data["M2"])
 data["M3"] = le.fit_transform(data["M3"])
 
+# defining the possible labels, the features and the features that are dropped
 predict = ["CH4_conv", "C2y", "C2H6y", "C2H4y", "COy", "CO2y"]
-# features=["Name","M1","M1_atom_number","M2","M2_atom_number","M3","M3_atom_number","Support","Support_ID","M2_mol","M3_mol","M1_mol%","M2_mol%","M3_mol%","Temp","Total_flow","Ar_flow","CH4_flow","O2_flow","CT","CH4/O2"]
 categorical_columns = ["M1", "M2", "M3", "Support_ID"]
 numerical_columns = ["M2_mol", "M3_mol", "Temp", "Ar_flow", "CH4_flow", "O2_flow", "M1_mol", "CT"]
 features = categorical_columns + numerical_columns
@@ -28,16 +28,20 @@ dropped = ["CH4_conv", "C2y", "C2H6y", "C2H4y", "COy", "CO2y", "C2s", "C2H6s", "
            "M1_atom_number", "M2_atom_number", "M3_atom_number", "Support", "CH4/O2", "Total_flow", "M1_mol%",
            "M2_mol%", "M3_mol%"]
 
-data["M2_mol%"] = data["M2_mol%"] + 1e-7
+# the dataset doesn't contain the M1 mol feature so it has to be calculated first
+data["M2_mol%"] = data["M2_mol%"] + 1e-7 # to avoid divide by zero errors
 data["M1_mol"] = data["M1_mol%"] * (data["M2_mol"] + data["M3_mol"]) / (data["M2_mol%"] + data["M3_mol%"])
 
-voorspel = predict[1]  # choose yield to predict
+# choose C2 yield as label
+voorspel = predict[1]  
 
+# making arrays for the label and features, standardizing the label
 X = data[features]
 y = np.array(data[voorspel])
 y = preprocessing.StandardScaler().fit_transform(y.reshape(-1, 1))
 y = np.ravel(y.reshape(-1, 1))
 
+# feature preprocessing
 categorical_encoder = OneHotEncoder(handle_unknown='ignore', sparse=False)
 numerical_pipe = Pipeline([
     ('imputer', preprocessing.StandardScaler())
@@ -47,6 +51,7 @@ preprocessing = ColumnTransformer(
     [('cat', categorical_encoder, categorical_columns),
      ('num', numerical_pipe, numerical_columns)])
 
+# making a pandas dataframe to store feature importances
 columns = [feature for feature in features]
 
 columns.append("Train score")
@@ -54,13 +59,16 @@ columns.append("Test score")
 
 df1 = pd.DataFrame(columns=columns)
 
+# defining the early stop criterion for the neural net fitting
 early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
+# calculates regression R² score
 def R2_scorer(ANN, x_test, y_test):
     y_pred = ANN.predict(x_test)
     score = r2_score(y_test,y_pred)
     return score
 
+# builds a neural network with keras sequential
 def build_model():
     model = keras.Sequential()
     model.add(layers.Dense(128, activation='relu', input_shape=(53,)))
@@ -80,6 +88,7 @@ def build_model():
     model.compile(loss='mse', optimizer=keras.optimizers.Adam(learning_rate=0.0001), metrics=['mae', 'mse'])
     return model
 
+# makes models of multiple dataset splits, determines feature importances and saves them in the pandas dataframe
 number_of_splits = 10
 for l in range(number_of_splits):
     # split data into test and validation + training data
@@ -107,4 +116,5 @@ for l in range(number_of_splits):
 
     df1.loc[l] = df_entry1
 
+# prints the pandas dataframe to csv
 df1.to_csv("Results ANN yields Nguyen et al.csv")
