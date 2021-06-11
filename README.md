@@ -6,7 +6,7 @@ The OCM database that was used in the work was constructed by Nguyen et al. (htt
 ## Generating synthetic datasets
 Generating different synthetic datasets is done by modifying the for loop in the dataset generation script. Examples of this can be found in the appendices of the thesis. Adding random error to feature values does not require the generation of new datasets. One can simply multiply feature values by a certain factor in an already generated dataset.
 
-## Dependencies
+## Used packages
 * pandas 1.1.4
 * scikit-learn 0.24.2
 * numpy 1.19.4
