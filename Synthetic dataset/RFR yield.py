@@ -5,18 +5,23 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn import preprocessing
 from sklearn.inspection import permutation_importance
 
+# reads one of the generated synthetic datasets
 data = pd.read_csv('SyntheticDataset100000datapts.csv')
 
+# defining label and features
 predict = 'Yield'
 features = ['Metal_conc', 'Acid_conc', 'Gamma', 'Epsilon']
 
+# make feature and label arrays
 X = np.array(data.drop(predict, 1))
 y = np.array(data[predict])
 
+# standardizing the feature values
 X = preprocessing.StandardScaler().fit_transform(X)
 y = preprocessing.StandardScaler().fit_transform(y.reshape(-1, 1))
 y = np.ravel(y.reshape(-1, 1))
 
+# makes a pandas dataframe that'll contain the feature importances
 columns = [feature for feature in features]
 columns.append('Train score')
 columns.append('Test score')
@@ -24,6 +29,7 @@ columns.append('Test score')
 df_impurity = pd.DataFrame(columns=columns)
 df_permutation = pd.DataFrame(columns=columns)
 
+# loop that constructs models for different dataset splits, chooses the best model for a given dataset split and saves the respective feature importances to the dataframe
 number_of_splits = 10
 random_states = [0, 42, 10, 5]
 for k in range(number_of_splits):
@@ -56,5 +62,6 @@ for k in range(number_of_splits):
     df_impurity.loc[k] = importances
     df_permutation.loc[k] = importances_bis
 
+# printing the dataframes that contain the feature importances
 df_impurity.to_csv('Impurity based feature importances.csv')
 df_permutation.to_csv('Permutation based feature importances.csv')
