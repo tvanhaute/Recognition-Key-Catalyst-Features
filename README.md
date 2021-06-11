@@ -11,3 +11,4 @@ Generating different synthetic datasets is done by modifying the for loop in the
 * scikit-learn 0.24.2
 * numpy 1.19.4
 * tensorflow 2.4.1
+* scikeras 0.3.1
