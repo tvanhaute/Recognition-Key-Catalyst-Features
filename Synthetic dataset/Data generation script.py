@@ -25,7 +25,7 @@ datapunten = 100000
 columns = ["Metal_conc", "Acid_conc", "Gamma", "Epsilon", "Yield"]
 df = pd.DataFrame(columns=columns)
 
-# loop that generates the different datapoints in the synthetic dataset
+# loop that generates the different datapoints in the synthetic dataset, this example has orthogonal features
 for i in range(datapunten):
 
     metal_random = random()
