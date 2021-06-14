@@ -6,7 +6,7 @@ from sklearn import preprocessing
 from sklearn.inspection import permutation_importance
 
 # reads one of the generated synthetic datasets
-data = pd.read_csv('Synthetic dataset orthogonal features.csv') #modify this text according to the dataset you want to analyze
+data = pd.read_csv('Synthetic dataset orthogonal features.csv') # modify this text according to the dataset you want to analyze
 
 # defining label and features
 predict = 'Yield'
